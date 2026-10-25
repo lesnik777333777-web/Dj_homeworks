@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Каталог</title>
+</head>
+<body>
+<p>Сортировать:
+  <a href="?sort=name">По названию</a> |
+  <a href="?sort=min_price">Сначала дешевые</a> |
+  <a href="?sort=max_price">Сначала дорогие</a>
+</p>
+
+
+<ul>
+  {% for phone in phones %}
+  <li>
+    <a href="{% url 'phone_detail' phone.slug %}">
+      {{ phone.name }} - {{ phone.price }} руб.
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+</body>
+</html>

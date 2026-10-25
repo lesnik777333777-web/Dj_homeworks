@@ -1,0 +1,28 @@
+# Виртуальное окружение
+.venv/
+venv/
+ENV/
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# База данных SQLite (если используешь локально)
+db.sqlite3
+db.sqlite3-journal
+
+# Файлы среды
+.env
+.env.local
+
+# IDE и редакторы
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
