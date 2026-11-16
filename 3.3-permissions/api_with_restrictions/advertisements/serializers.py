@@ -1,45 +1,31 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
-
-from advertisements.models import Advertisement
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """Serializer для пользователя."""
-
-    class Meta:
-        model = User
-        fields = ('id', 'username', 'first_name',
-                  'last_name',)
-
+from .models import Advertisement, AdvertisementStatusChoices
 
 class AdvertisementSerializer(serializers.ModelSerializer):
-    """Serializer для объявления."""
-
-    creator = UserSerializer(
-        read_only=True,
+    creator = serializers.HiddenField(
+        default=serializers.CurrentUserDefault()
     )
 
     class Meta:
         model = Advertisement
-        fields = ('id', 'title', 'description', 'creator',
-                  'status', 'created_at', )
+        fields = ('id', 'title', 'description', 'status', 'creator', 'created_at', 'updated_at')
 
-    def create(self, validated_data):
-        """Метод для создания"""
+    def validate(self, attrs):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            is_creating = request.method == 'POST'
+            is_updating_to_open = request.method in ('PUT', 'PATCH') and attrs.get('status') == AdvertisementStatusChoices.OPEN
 
-        # Простановка значения поля создатель по-умолчанию.
-        # Текущий пользователь является создателем объявления
-        # изменить или переопределить его через API нельзя.
-        # обратите внимание на `context` – он выставляется автоматически
-        # через методы ViewSet.
-        # само поле при этом объявляется как `read_only=True`
-        validated_data["creator"] = self.context["request"].user
-        return super().create(validated_data)
+            if is_creating or is_updating_to_open:
+                open_ads_count = Advertisement.objects.filter(
+                    creator=request.user,
+                    status=AdvertisementStatusChoices.OPEN
+                ).count()
 
-    def validate(self, data):
-        """Метод для валидации. Вызывается при создании и обновлении."""
+                # Если обновляем существующее и оно уже было OPEN, не учитываем его в лимите
+                if self.instance and self.instance.status == AdvertisementStatusChoices.OPEN:
+                    open_ads_count -= 1
 
-        # TODO: добавьте требуемую валидацию
-
-        return data
+                if open_ads_count >= 10:
+                    raise serializers.ValidationError("У пользователя не может быть более 10 открытых объявлений.")
+        return attrs

@@ -1,42 +1,23 @@
-# примеры API-запросов
+   POST http://127.0.0.1:8000/api/advertisements/
+   Authorization: Token 86f5aaa03b8a0debbffa3accbcff9e3405440989
+   Content-Type: application/json
 
-@baseUrl = https://localhost:8000/api
-
-# получение объявлений
-GET {{baseUrl}}/advertisements/
-Content-Type: application/json
-
-###
-
-# создание объявления
-POST {{baseUrl}}/advertisements/
-Content-Type: application/json
-Authorization: Token 902ef055a9ac93f18327f1f9c45ab059f1a62c7d
-
-{
-  "title": "Шкаф IKEA",
-  "description": "Срочно"
-}
+   {
+       "title": "Продам гараж",
+       "description": "Очень теплый гараж",
+       "status": "OPEN"
+   }
 
 ###
 
-# попытка поменять объявление
-PATCH {{baseUrl}}/advertisements/1/
-Content-Type: application/json
-Authorization: Token 902ef055a9ac93f18327f1f9c45ab059f1a62c7d
-
-{
-  "status": "CLOSED"
-}
+   GET http://127.0.0.1:8000/api/advertisements/?created_at_after=2023-01-01&status=OPEN
 
 ###
 
-# фильтрация по создателю
-GET {{baseUrl}}/advertisements/?creator=3
-Content-Type: application/json
+   POST http://127.0.0.1:8000/api/advertisements/{id}/favorite/
+   Authorization: Token 86f5aaa03b8a0debbffa3accbcff9e3405440989
 
 ###
 
-# фильтрация по дате
-GET {{baseUrl}}/advertisements/?created_at_before=2020-10-01
-Content-Type: application/json
+   GET http://127.0.0.1:8000/api/advertisements/my_favorites/
+   Authorization: Token 86f5aaa03b8a0debbffa3accbcff9e3405440989
